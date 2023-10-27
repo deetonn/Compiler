@@ -23,6 +23,15 @@ enum class token_type {
     ARROW,
     AMPERSAND,
 
+    ADD, 
+    PLUS_EQUAL,
+    MINUS, 
+    MINUS_EQUAL,
+    SLASH, 
+    SLASH_EQUAL,
+    STAR,
+    STAR_EQUAL,
+
     EQUALS,
     EQUALS_EQUALS,
     NOT_EQUAL,
@@ -40,8 +49,9 @@ enum class token_type {
     LESSER_EQUALS,
     BITWISE_NOT,
     SEMI_COLON,
+    END_OF_FILE,
     // keywords
-  
+
     // https://en.cppreference.com/w/c/language/_Alignas
     ALIGNAS,
     // https://en.cppreference.com/w/c/language/_Alignof
@@ -97,7 +107,7 @@ enum class token_type {
     REGISTER,
     // https://en.cppreference.com/w/c/keyword/restrict
     RESTRICT,
-   // https://en.cppreference.com/w/c/keyword/return
+    // https://en.cppreference.com/w/c/keyword/return
     RETURN,
     // https://en.cppreference.com/w/c/keyword/short
     SHORT,

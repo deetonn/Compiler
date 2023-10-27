@@ -10,57 +10,75 @@
 
 COMPILER_API_BEGIN
 
-static const std::unordered_map<std::string, TokenType> keywords = {
-      { "alignas", TokenType::Alignas },
-      { "alignof", TokenType::Alignof },
-      { "auto", TokenType::Auto },
-      { "bool", TokenType::Bool },
-      { "break", TokenType::Break },
-      { "case", TokenType::Case },
-      { "char", TokenType::Char },
-      { "const", TokenType::Const },
-      { "continue", TokenType::Continue },
-      { "default", TokenType::Default },
-      { "do", TokenType::Do },
-      { "double", TokenType::Double },
-      { "else", TokenType::Else },
-      { "enum", TokenType::Enum },
-      { "extern", TokenType::Extern },
-      { "false", TokenType::False },
-      { "float", TokenType::Float },
-      { "for", TokenType::For },
-      { "goto", TokenType::Goto },
-      { "if", TokenType::If },
-      { "inline", TokenType::Inline },
-      { "int", TokenType::Int },
-      { "long", TokenType::Long },
-      { "nullptr", TokenType::Nullptr },
-      { "register", TokenType::Register },
-      { "restrict", TokenType::Restrict },
-      { "return", TokenType::Return },
-      { "short", TokenType::Short },
-      { "signed", TokenType::Signed },
-      { "sizeof", TokenType::Sizeof },
-      { "static", TokenType::Static },
-      { "static_assert", TokenType::StaticAssert },
-      { "struct", TokenType::Struct },
-      { "switch", TokenType::Switch },
-      { "thread_local", TokenType::ThreadLocal },
-      { "true", TokenType::True },
-      { "typedef", TokenType::Typedef },
-      { "typeof", TokenType::Typeof },
-      { "typeof_unqual", TokenType::TypeofUnqual },
-      { "union", TokenType::Union },
-      { "unsigned", TokenType::Unsigned },
-      { "void", TokenType::Void },
-      { "volatile", TokenType::Volatile },
-      { "while", TokenType::While }
+static const std::unordered_map<std::string, token_type> keywords = {
+      { "alignas", token_type::ALIGNAS },
+      { "alignof", token_type::ALIGNOF },
+      { "auto", token_type::AUTO },
+      { "bool", token_type::BOOL },
+      { "break", token_type::BREAK },
+      { "case", token_type::CASE },
+      { "char", token_type::CHAR },
+      { "const", token_type::CONST },
+      { "continue", token_type::CONTINUE },
+      { "default", token_type::DEFAULT },
+      { "do", token_type::DO },
+      { "double", token_type::DOUBLE },
+      { "else", token_type::ELSE },
+      { "enum", token_type::ENUM },
+      { "extern", token_type::EXTERN },
+      { "false", token_type::FALSE },
+      { "float", token_type::FLOAT },
+      { "for", token_type::FOR },
+      { "goto", token_type::GOTO },
+      { "if", token_type::IF },
+      { "inline", token_type::INLINE },
+      { "int", token_type::INT },
+      { "long", token_type::LONG },
+      { "nullptr", token_type::NULLPTR },
+      { "register", token_type::REGISTER },
+      { "restrict", token_type::RESTRICT },
+      { "return", token_type::RETURN },
+      { "short", token_type::SHORT },
+      { "signed", token_type::SIGNED },
+      { "sizeof", token_type::SIZEOF },
+      { "static", token_type::STATIC },
+      { "static_assert", token_type::STATIC_ASSERT },
+      { "struct", token_type::STRUCT },
+      { "switch", token_type::SWITCH },
+      { "thread_local", token_type::THREAD_LOCAL },
+      { "true", token_type::TRUE },
+      { "typedef", token_type::TYPEDEF },
+      { "typeof", token_type::TYPEOF },
+      { "typeof_unqual", token_type::TYPEOF_UNQUAL },
+      { "union", token_type::UNION },
+      { "unsigned", token_type::UNSIGNED },
+      { "void", token_type::VOID },
+      { "volatile", token_type::VOLATILE },
+      { "while", token_type::WHILE }
 };
 
 #define CONSTANT_CHAR(identifier, value) static constexpr inline char identifier = value
 
 CONSTANT_CHAR(left_brace, '{');
-CONSTANT_CHAR(right_brace, '}'); 
+CONSTANT_CHAR(right_brace, '}');
+
+CONSTANT_CHAR(left_paren, '(');
+CONSTANT_CHAR(right_paren, ')');
+
+CONSTANT_CHAR(comma, ',');
+CONSTANT_CHAR(dot, '.');
+
+CONSTANT_CHAR(equal, '=');
+
+CONSTANT_CHAR(plus, '+');
+CONSTANT_CHAR(minus, '-');
+CONSTANT_CHAR(star, '*');
+CONSTANT_CHAR(slash, '/');
+
+CONSTANT_CHAR(greater_than, '>');
+CONSTANT_CHAR(lesser_than, '<');
+
+CONSTANT_CHAR(eof, '\0');
 
 COMPILER_API_END // !COMPILER_API_BEGIN
 
