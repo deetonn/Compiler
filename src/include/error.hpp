@@ -6,7 +6,7 @@
 #include <format>
 #include <string>
 
-COMPILER_API_BEGIN
+// COMPILER_API_BEGIN
 
 class error {
 private:
@@ -22,7 +22,7 @@ public:
     }
 };
 
-COMPILER_API_END
+// COMPILER_API_END
 
 #define _ERROR_HPP
 #endif

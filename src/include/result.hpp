@@ -7,7 +7,7 @@
 #include <variant>
 #include <type_traits>
 
-COMPILER_API_BEGIN
+// COMPILER_API_BEGIN
 
 template<class T, class E>
 class result {
@@ -42,7 +42,7 @@ public:
   }
 };
 
-COMPILER_API_END
+// COMPILER_API_END
 
 #define _RESULT_HPP
 #endif // !_RESULT_HPP
