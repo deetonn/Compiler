@@ -1,12 +1,11 @@
-
-#include <unordered_map>
 #ifndef COMPILER_LEXING_CONSTANTS_HPP
 
-#include "../../common.hpp"
+#include "../../common/common.hpp"
 
 #include "token_type.hpp"
 
 #include <string>
+#include <unordered_map>
 
 COMPILER_API_BEGIN
 

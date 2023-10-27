@@ -1,12 +1,10 @@
-
-#include <string.h>
 #ifndef LEXER_TOKEN_HPP
 
 #include <cstddef>
 #include <string>
 #include <optional>
 
-#include "../../common.hpp"
+#include "../../common/common.hpp"
 
 #include "token_type.hpp"
 

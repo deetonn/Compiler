@@ -1,7 +1,7 @@
 
 #ifndef _ERROR_HPP
 
-#include "../common.hpp"
+#include "common.hpp"
 
 #include <format>
 #include <string>

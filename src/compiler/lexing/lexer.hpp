@@ -12,12 +12,12 @@
 #include <fstream>
 #include <random>
 
-#include "../../common.hpp"
+#include "../../common/common.hpp"
 #include "constants.hpp"
 
 #include "token.hpp"
-#include "../../include/result.hpp"
-#include "../../include/error.hpp"
+#include "../../common/result.hpp"
+#include "../../common/error.hpp"
 
 COMPILER_API_BEGIN
 

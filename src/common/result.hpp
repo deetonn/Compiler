@@ -1,8 +1,6 @@
-
-#include <corecrt_math.h>
 #ifndef _RESULT_HPP
 
-#include "../common.hpp"
+#include "common.hpp"
 
 #include <variant>
 #include <type_traits>

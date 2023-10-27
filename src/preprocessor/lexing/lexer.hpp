@@ -1,7 +1,7 @@
 #ifndef PREPROCESSOR_LEXER_HPP
 #define PREPROCESSOR_LEXER_HPP
 
-#include "../../common.hpp"
+#include "../../common/common.hpp"
 
 #include <cstddef>
 #include <string>

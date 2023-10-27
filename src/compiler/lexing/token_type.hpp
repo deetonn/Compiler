@@ -1,8 +1,6 @@
-
-#include <corecrt_math.h>
 #ifndef LEXER_TOKEN_TYPE_HPP
 
-#include "../../common.hpp"
+#include "../../common/common.hpp"
 
 #include <string>
 
