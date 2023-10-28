@@ -119,7 +119,7 @@ inline bool is_valid_number_content(char c) noexcept {
     return (c == '.' || std::isdigit(c));
 }
 
-COMPILER_API_END // !COMPILER_API_BEGIN
+COMPILER_API_END // COMPILER_API_BEGIN
 
 #define COMPILER_LEXING_CONSTANTS_HPP
 #endif // !COMPILER_LEXING_CONSTANTS_HPP

@@ -15,7 +15,7 @@
 #include "../../common/common.hpp"
 #include "constants.hpp"
 
-#include "token.hpp"
+#include "../types.hpp"
 #include "../../common/result.hpp"
 #include "../../common/error.hpp"
 #include "../../common/io.hpp"

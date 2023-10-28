@@ -1,13 +1,13 @@
-#ifndef LEXER_TOKEN_HPP
 
-#include <cstddef>
-#include <string>
+#ifndef _COMPILER_TYPES_HPP
+
+#include "../common/common.hpp"
+#include "lexing/token_type.hpp"
+
 #include <optional>
+#include <string>
 #include <format>
-
-#include "../../common/common.hpp"
-
-#include "token_type.hpp"
+#include <cstddef>
 
 COMPILER_API_BEGIN
 
@@ -60,11 +60,11 @@ public:
     token() = delete;
 
     inline
-        token(token_type type,
-            span span,
-            source_location location,
-            std::optional<std::string> lexeme = std::nullopt)
-        : m_type(type), m_span(span), m_location(location), m_lexeme(lexeme)
+    token(token_type type,
+          span span,
+          source_location location,
+          std::optional<std::string> lexeme = std::nullopt
+    ) : m_type(type), m_span(span), m_location(location), m_lexeme(lexeme)
     {}
 
     // the type of this token.
@@ -93,5 +93,5 @@ public:
 
 COMPILER_API_END
 
-#define LEXER_TOKEN_HPP
-#endif // !LEXER_TOKEN_HPP
+#define _COMPILER_TYPES_HPP
+#endif // !_COMPILER_TYPES_HPP
