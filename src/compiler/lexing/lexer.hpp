@@ -78,8 +78,13 @@ public:
         : m_source_info{ info }
     {}
 
-    inline auto lex_tokens() noexcept {
-        
+    inline auto lex_tokens() noexcept -> result<void, error> {
+        while (m_internals.position <= m_source_info.contents().size()) {
+            auto lex_result = this->lex_single_char(this->peek_current());
+            if (lex_result.is_err()) {
+                // TODO: add an actual diagnostics system for outputting errors.
+            }
+        }
     }
      
     inline auto lex_single_char(char c) -> result<token, error> {
@@ -149,6 +154,14 @@ public:
         m_span.end++;
     }
 
+    inline auto peek_current() const noexcept -> char {
+        auto& src = m_source_info.contents();
+        if (m_internals.position >= src.size()) {
+            return eof;
+        }
+        return src.at(m_internals.position);
+    }
+
     inline auto peek_next() const noexcept -> char {
         auto& src = m_source_info.contents();
         if (m_internals.position + 1 >= src.size()) {
@@ -161,9 +174,11 @@ public:
         m_span.begin = m_span.end;
         if (use_source) {
             std::string contents = this->get_current_contents();
+            m_internals.position += contents.size();
             return token(kind, m_span, get_source_location(), contents);
         }
         else {
+            m_internals.position += 1;
             return token(kind, m_span, get_source_location());
         }
     }

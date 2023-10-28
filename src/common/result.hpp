@@ -24,7 +24,7 @@ public:
   {}
 
   inline bool is_err() const noexcept {
-    return std::get<1>(&m_variant) != nullptr;  
+    return std::get_if<1>(&m_variant) != nullptr;  
   }
 
   inline bool is_okay() const noexcept {
@@ -32,11 +32,11 @@ public:
   }
 
   inline T* get() const noexcept {
-    return std::get<0>(&m_variant); 
+    return (T*)std::get_if<0>(&m_variant); 
   }
 
   inline E* get_err() const noexcept {
-    return std::get<1>(&m_variant);
+    return (E*)std::get_if<1>(&m_variant);
   }
 };
 
@@ -57,7 +57,7 @@ public:
   {}
 
   inline bool is_err() const noexcept {
-    return std::get<1>(&m_variant) != nullptr;
+    return std::get_if<1>(&m_variant) != nullptr;
   }
 
   inline bool is_okay() const noexcept {
@@ -67,7 +67,7 @@ public:
   // dont add get(), you cannot "get" void.
 
   inline E* get_err() const noexcept {
-    return std::get<1>(&m_variant);
+    return (E*)std::get_if<1>(&m_variant);
   }
 };
 
