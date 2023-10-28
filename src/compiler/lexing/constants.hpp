@@ -69,6 +69,9 @@ CONSTANT_CHAR(right_brace, '}');
 CONSTANT_CHAR(left_paren, '(');
 CONSTANT_CHAR(right_paren, ')');
 
+CONSTANT_CHAR(left_bracket, '[');
+CONSTANT_CHAR(right_bracket, ']');
+
 CONSTANT_CHAR(comma, ',');
 CONSTANT_CHAR(dot, '.');
 
@@ -96,11 +99,16 @@ CONSTANT_CHAR(bang, '!');
 
 CONSTANT_CHAR(percent, '%');
 CONSTANT_CHAR(question_mark, '?');
+CONSTANT_CHAR(colon, ':');
 
 CONSTANT_CHAR(eof, '\0');
 
-inline bool is_valid_identifier_char(char c) noexcept {
+inline bool is_valid_identifier_start(char c) noexcept {
     return (c == '_' || std::isalpha(c));
+}
+
+inline bool is_valid_identifier_rest(char c) noexcept {
+    return (c == '_' || std::isalpha(c) || std::isdigit(c));
 }
 
 inline bool is_valid_number_start(char c) noexcept {

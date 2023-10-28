@@ -15,6 +15,9 @@ enum class token_type {
     LEFT_PAREN,
     RIGHT_PAREN,
 
+    LEFT_BRACKET, 
+    RIGHT_BRACKET,
+
     COMMA,
     DOT,
     // The "->" operator.
@@ -52,6 +55,8 @@ enum class token_type {
     MODULO,
     BITWISE_XOR,
     XOR_EQUALS,
+    QUESTION_MARK,
+    COLON,
     END_OF_FILE,
     // represents a nothing token.
     EMPTY,
@@ -160,6 +165,8 @@ inline std::string token_type_to_string(token_type type) {
     case token_type::RIGHT_BRACE: return "RIGHT_BRACE";
     case token_type::LEFT_PAREN: return "LEFT_PAREN";
     case token_type::RIGHT_PAREN: return "RIGHT_PAREN";
+    case token_type::LEFT_BRACKET: return "LEFT_BRACKET";
+    case token_type::RIGHT_BRACKET: return "RIGHT_BRACKET";
     case token_type::COMMA: return "COMMA";
     case token_type::DOT: return "DOT";
     case token_type::ARROW: return "ARROW";
@@ -245,6 +252,8 @@ inline std::string token_type_to_string(token_type type) {
     case token_type::MODULO: return "MODULO";
     case token_type::BITWISE_XOR: return "BITWISE_XOR";
     case token_type::XOR_EQUALS: return "XOR_EQUALS";
+    case token_type::QUESTION_MARK: return "QUESTION_MARK";
+    case token_type::COLON: return "COLON";
     }
 
     return "UNKNOWN";

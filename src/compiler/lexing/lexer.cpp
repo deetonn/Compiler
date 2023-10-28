@@ -51,6 +51,10 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         return make_token(token_type::LEFT_BRACE);
     case right_brace:
         return make_token(token_type::RIGHT_BRACE);
+    case left_bracket:
+        return make_token(token_type::LEFT_BRACKET);
+    case right_bracket:
+        return make_token(token_type::RIGHT_BRACKET);
     case comma:
         return make_token(token_type::COMMA);
     case dot:
@@ -144,11 +148,15 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
             return make_token(token_type::NOT_EQUAL);
         }
         return make_token(token_type::BANG);
+    case question_mark:
+        return make_token(token_type::QUESTION_MARK);
+    case colon:
+        return make_token(token_type::COLON);
     case eof:
         return make_token(token_type::END_OF_FILE);
     }
 
-    if (is_valid_identifier_char(c)) {
+    if (is_valid_identifier_start(c)) {
         return this->lex_identifier();
     }
 
@@ -228,7 +236,11 @@ auto compiler::lexer::lex_numeric_literal() noexcept -> result<token, error> {
 auto compiler::lexer::lex_identifier() noexcept -> result<token, error> {
     std::string contents{};
 
-    while (is_valid_identifier_char(peek_current())) {
+    if (!is_valid_identifier_start(peek_current())) {
+        return error("invalid character for the start of an identifier ({}) (A-z+_ is supported)", peek_current());
+    }
+
+    while (is_valid_identifier_rest(peek_current())) {
         contents.push_back(peek_current());
         move_forward();
     }
