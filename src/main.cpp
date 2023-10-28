@@ -3,7 +3,12 @@
 #include <iostream>
 #include <format>
 
-#define FAIL(fmt, ...) std::cerr << std::format(fmt, ##__VA_ARGS__) << '\n'; return -1
+// link this in?
+constexpr const char name[] = "Compiler";
+constexpr const char version[] = "0.0.1";
+
+#define FAIL(fmt, ...) std::cerr << std::format("{} v{}", name, version) << "\n\n";\
+  std::cerr << std::format(fmt, ##__VA_ARGS__) << '\n'; return -1
 
 int main(int argc, char** argv) {
     // NOTE: argv[0] is always the path of this executable.
@@ -19,6 +24,18 @@ int main(int argc, char** argv) {
 
     auto src = *source_info.get();
     auto lexer = compiler::lexer{src};
+
+    auto lex_result = lexer.lex_tokens();
+
+    if (lex_result.is_err()) {
+        FAIL("lexer failed. ({})", lex_result.get_err()->what());
+    }
+
+    auto tokens = lexer.release_tokens();
+
+    for (auto& token : tokens) {
+        println("{}", token.to_string());
+    }
 
     return 0;
 }
