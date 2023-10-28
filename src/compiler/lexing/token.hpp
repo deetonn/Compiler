@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <string>
 #include <optional>
+#include <format>
 
 #include "../../common/common.hpp"
 
@@ -36,6 +37,10 @@ public:
     // The column at while the token occurs at. (this is relative to the line)
     inline std::size_t column() const noexcept {
         return m_column;
+    }
+
+    inline std::string to_string() const noexcept {
+        return std::format("{}:{}:{}", source_file(), line(), column());
     }
 
     // static constructor.
@@ -72,6 +77,18 @@ public:
     // The optional contents attached to this token. This is set when the type() is an identifier, string or number.
     inline const std::optional<std::string>& lexeme() const noexcept { return m_lexeme; }
     inline std::optional<std::string>& lexeme() noexcept { return m_lexeme; }
+
+    inline std::string to_string() const noexcept {
+        bool has_content = lexeme().has_value();
+        if (has_content) {
+            auto& content = lexeme().value();
+            return std::format("Token({}) [{}] at ({})",
+                token_type_to_string(type()),
+                content,
+                source_location().to_string());
+        }
+        return std::format("Token({}) at ({})", token_type_to_string(type()), source_location().to_string());
+    }
 };
 
 COMPILER_API_END

@@ -18,6 +18,7 @@
 #include "token.hpp"
 #include "../../common/result.hpp"
 #include "../../common/error.hpp"
+#include "../../common/io.hpp"
 
 COMPILER_API_BEGIN
 
@@ -83,12 +84,52 @@ public:
             auto lex_result = this->lex_single_char(this->peek_current());
             if (lex_result.is_err()) {
                 // TODO: add an actual diagnostics system for outputting errors.
+                const char* msg = lex_result.get_err()->what();
+                eprintln("[LEXER]: failed to lex contents. ({})", msg);
+                return error("{}", msg);
+            }
+            else {
+                auto&& token = std::move(*lex_result.get());
+                // discard empty tokens.
+                if (token.type() != token_type::EMPTY) {
+                    m_tokens.push_back(token);
+                }
             }
         }
+
+        return {};
+    }
+
+    inline auto release_tokens() noexcept -> std::vector<token> {
+        return std::move(m_tokens);
     }
      
     inline auto lex_single_char(char c) -> result<token, error> {
+        if (is_valid_identifier_char(c)) {
+            return this->lex_identifier();
+        }
+
+        if (is_valid_number_start(c)) {
+            return this->lex_numeric_literal();
+        }
+
         switch (c) {
+        case '\n':
+            m_internals.line += 1;
+            m_internals.column = 0;
+            move_forward();
+            return make_token(token_type::EMPTY);
+        case '\r':
+            if (peek_next() == '\n') {
+                move_forward();
+                m_internals.line += 1;
+                m_internals.column = 0;
+            }
+            return make_token(token_type::EMPTY);
+        case semi_colon:
+            return make_token(token_type::SEMI_COLON);
+        case ' ':
+            return make_token(token_type::EMPTY);
         case left_paren:
             return make_token(token_type::LEFT_PAREN);
         case right_paren:
@@ -145,7 +186,57 @@ public:
             return make_token(token_type::END_OF_FILE);
         }
 
-        return error("unexpected character ({})", c);
+        return error("unexpected character ({}) at ({})", c, get_source_location().to_string());
+    }
+
+    inline auto lex_numeric_literal() -> result<token, error> {
+        auto contents = std::string{};
+
+        // TODO: Integrals can contain postfixes like "i" or "u" to infer the type. 
+        //       Handle these cases.
+
+        char next;
+        bool encountered_dot = false;
+        while (is_valid_number_content(next = peek_current())) {
+            if (next == '.') {
+                if (encountered_dot) {
+                    return error("invalid numeric literal. floating point numbers can only contain one \".\"");
+                }
+                encountered_dot = true;
+            }
+            contents.push_back(next);
+            move_forward();
+        }
+
+        if (encountered_dot) {
+            return make_token(token_type::FLOATING_POINT_LITERAL, true);
+        }
+        else {
+            return make_token(token_type::INTEGER_LITERAL, true);
+        }
+    }
+
+    inline auto lex_identifier() -> result<token, error> {
+        auto contents = std::string{};
+
+        char next;
+        while (true) {
+            next = peek_current();
+            contents.push_back(next);
+
+            if (!is_valid_identifier_char(peek_next())) {
+                break;
+            }
+
+            move_forward();
+        }
+
+        if (keywords.contains(contents)) {
+            auto tt = keywords.at(contents);
+            return make_token(tt);
+        }
+
+        return make_token(token_type::IDENTIFIER, true);
     }
 
     inline void move_forward() noexcept {
@@ -170,15 +261,20 @@ public:
         return src.at(m_internals.position + 1);
     }
 
+    //inline auto make_token_with_explicit_lexeme(token_type kind, std::string&& lexeme) noexcept -> token {
+
+    //}
+
     inline auto make_token(token_type kind, bool use_source = false) noexcept -> token {
-        m_span.begin = m_span.end;
         if (use_source) {
             std::string contents = this->get_current_contents();
             m_internals.position += contents.size();
+            m_span.begin = m_span.end;
             return token(kind, m_span, get_source_location(), contents);
         }
         else {
             m_internals.position += 1;
+            m_span.begin = m_span.end;
             return token(kind, m_span, get_source_location());
         }
     }

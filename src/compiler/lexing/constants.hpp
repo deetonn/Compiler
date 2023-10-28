@@ -6,6 +6,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <cctype>
 
 COMPILER_API_BEGIN
 
@@ -81,7 +82,21 @@ CONSTANT_CHAR(slash, '/');
 CONSTANT_CHAR(greater_than, '>');
 CONSTANT_CHAR(lesser_than, '<');
 
+CONSTANT_CHAR(semi_colon, ';');
+
 CONSTANT_CHAR(eof, '\0');
+
+inline bool is_valid_identifier_char(char c) noexcept {
+    return (c == '_' || std::isalpha(c));
+}
+
+inline bool is_valid_number_start(char c) noexcept {
+    return (c == '+' || c == '-' || std::isdigit(c));
+}
+
+inline bool is_valid_number_content(char c) noexcept {
+    return (c == '.' || std::isdigit(c));
+}
 
 COMPILER_API_END // !COMPILER_API_BEGIN
 

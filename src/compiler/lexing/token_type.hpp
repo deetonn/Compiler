@@ -48,6 +48,12 @@ enum class token_type {
     BITWISE_NOT,
     SEMI_COLON,
     END_OF_FILE,
+    // represents a nothing token.
+    EMPTY,
+
+    IDENTIFIER,
+    FLOATING_POINT_LITERAL,
+    INTEGER_LITERAL,
     // keywords
 
     // https://en.cppreference.com/w/c/language/_Alignas
@@ -140,6 +146,95 @@ enum class token_type {
     // https://en.cppreference.com/w/c/keyword/while
     WHILE,
 };
+
+inline std::string token_type_to_string(token_type type) {
+    switch (type) {
+    case token_type::LEFT_BRACE: return "LEFT_BRACE";
+    case token_type::RIGHT_BRACE: return "RIGHT_BRACE";
+    case token_type::LEFT_PAREN: return "LEFT_PAREN";
+    case token_type::RIGHT_PAREN: return "RIGHT_PAREN";
+    case token_type::COMMA: return "COMMA";
+    case token_type::DOT: return "DOT";
+    case token_type::ARROW: return "ARROW";
+    case token_type::AMPERSAND: return "AMPERSAND";
+    case token_type::ADD: return "ADD";
+    case token_type::PLUS_EQUAL: return "PLUS_EQUAL";
+    case token_type::MINUS: return "MINUS";
+    case token_type::MINUS_EQUAL: return "MINUS_EQUAL";
+    case token_type::SLASH: return "SLASH";
+    case token_type::SLASH_EQUAL: return "SLASH_EQUAL";
+    case token_type::STAR: return "STAR";
+    case token_type::STAR_EQUAL: return "STAR_EQUAL";
+    case token_type::EQUALS: return "EQUALS";
+    case token_type::EQUALS_EQUALS: return "EQUALS_EQUALS";
+    case token_type::NOT_EQUAL: return "NOT_EQUAL";
+    case token_type::BANG: return "BANG";
+    case token_type::BITWISE_OR: return "BITWISE_OR";
+    case token_type::OR: return "OR";
+    case token_type::BITWISE_AND: return "BITWISE_AND";
+    case token_type::AND: return "AND";
+    case token_type::DOUBLE_QUOTE: return "DOUBLE_QUOTE";
+    case token_type::SINGLE_QUOTE: return "SINGLE_QUOTE";
+    case token_type::GREATER_THAN: return "GREATER_THAN";
+    case token_type::GREATER_EQUALS: return "GREATER_EQUALS";
+    case token_type::LESSER_THAN: return "LESSER_THAN";
+    case token_type::LESSER_EQUALS: return "LESSER_EQUALS";
+    case token_type::BITWISE_NOT: return "BITWISE_NOT";
+    case token_type::SEMI_COLON: return "SEMI_COLON";
+    case token_type::END_OF_FILE: return "END_OF_FILE";
+    case token_type::ALIGNAS: return "ALIGNAS";
+    case token_type::ALIGNOF: return "ALIGNOF";
+    case token_type::AUTO: return "AUTO";
+    case token_type::BOOL: return "BOOL";
+    case token_type::BREAK: return "BREAK";
+    case token_type::CASE: return "CASE";
+    case token_type::CHAR: return "CHAR";
+    case token_type::CONST: return "CONST";
+    case token_type::CONTINUE: return "CONTINUE";
+    case token_type::DEFAULT: return "DEFAULT";
+    case token_type::DO: return "DO";
+    case token_type::DOUBLE: return "DOUBLE";
+    case token_type::LONG_DOUBLE: return "LONG_DOUBLE";
+    case token_type::ELSE: return "ELSE";
+    case token_type::ENUM: return "ENUM";
+    case token_type::EXTERN: return "EXTERN";
+    case token_type::TRUE: return "TRUE";
+    case token_type::FALSE: return "FALSE";
+    case token_type::FLOAT: return "FLOAT";
+    case token_type::FOR: return "FOR";
+    case token_type::GOTO: return "GOTO";
+    case token_type::IF: return "IF";
+    case token_type::INLINE: return "INLINE";
+    case token_type::INT: return "INT";
+    case token_type::LONG: return "LONG";
+    case token_type::NULLPTR: return "NULLPTR";
+    case token_type::REGISTER: return "REGISTER";
+    case token_type::RESTRICT: return "RESTRICT";
+    case token_type::RETURN: return "RETURN";
+    case token_type::SHORT: return "SHORT";
+    case token_type::SIGNED: return "SIGNED";
+    case token_type::SIZEOF: return "SIZEOF";
+    case token_type::STATIC: return "STATIC";
+    case token_type::STATIC_ASSERT: return "STATIC_ASSERT";
+    case token_type::STRUCT: return "STRUCT";
+    case token_type::SWITCH: return "SWITCH";
+    case token_type::THREAD_LOCAL: return "THREAD_LOCAL";
+    case token_type::TYPEDEF: return "TYPEDEF";
+    case token_type::TYPEOF: return "TYPEOF";
+    case token_type::TYPEOF_UNQUAL: return "TYPEOF_UNQUAL";
+    case token_type::UNION: return "UNION";
+    case token_type::UNSIGNED: return "UNSIGNED";
+    case token_type::VOID: return "VOID";
+    case token_type::VOLATILE: return "VOLATILE";
+    case token_type::WHILE: return "WHILE";
+    case token_type::EMPTY: return "EMPTY";
+    case token_type::IDENTIFIER: return "IDENTIFIER";
+    case token_type::FLOATING_POINT_LITERAL: return "FLOAT_LITERAL";
+    case token_type::INTEGER_LITERAL: return "INTEGER_LITERAL";
+    }
+
+    return "UNKNOWN";
+}
 
 // NOTE: there are still some keywords that I haven't added
 // because they are prefixed with "_". I generally assume that means
