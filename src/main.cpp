@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
     }
 
     auto src = *source_info.get();
+    // NOTE: If you are to preprocess, do it here.
+    //       "src" is a std::string with the file contents.
     auto lexer = compiler::lexer{src};
 
     auto lex_result = lexer.lex_tokens();
