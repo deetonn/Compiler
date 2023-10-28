@@ -78,6 +78,10 @@ public:
         : m_source_info{ info }
     {}
 
+    inline auto lex_tokens() noexcept {
+        
+    }
+     
     inline auto lex_single_char(char c) -> result<token, error> {
         switch (c) {
         case left_paren:

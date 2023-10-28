@@ -40,6 +40,37 @@ public:
   }
 };
 
+// This specialization exists for when there isn't really any data you want to return, but you do
+// want to return an error.
+template<class E>
+class result<void, E> {
+private:
+  std::variant<std::nullptr_t, E> m_variant;
+public:
+  static_assert(std::is_move_assignable<E>::value, "result<void, E>: E must be move assignable.");
+
+  inline result()
+    : m_variant{nullptr}
+  {}
+  inline result(E&& err) noexcept 
+    : m_variant{std::move(err)}
+  {}
+
+  inline bool is_err() const noexcept {
+    return std::get<1>(&m_variant) != nullptr;
+  }
+
+  inline bool is_okay() const noexcept {
+    return is_err() == false;
+  }
+
+  // dont add get(), you cannot "get" void.
+
+  inline E* get_err() const noexcept {
+    return std::get<1>(&m_variant);
+  }
+};
+
 // COMPILER_API_END
 
 #define _RESULT_HPP
