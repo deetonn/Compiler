@@ -85,6 +85,18 @@ CONSTANT_CHAR(lesser_than, '<');
 CONSTANT_CHAR(semi_colon, ';');
 CONSTANT_CHAR(space, ' ');
 
+CONSTANT_CHAR(double_quote, '"');
+CONSTANT_CHAR(single_quote, '\'');
+
+CONSTANT_CHAR(ampersand, '&');
+CONSTANT_CHAR(pipe, '|');
+CONSTANT_CHAR(tilde, '~');
+CONSTANT_CHAR(caret, '^');
+CONSTANT_CHAR(bang, '!');
+
+CONSTANT_CHAR(percent, '%');
+CONSTANT_CHAR(question_mark, '?');
+
 CONSTANT_CHAR(eof, '\0');
 
 inline bool is_valid_identifier_char(char c) noexcept {

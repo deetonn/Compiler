@@ -20,6 +20,8 @@
 #include "../../common/error.hpp"
 #include "../../common/io.hpp"
 
+#define LEXER_DEBUG 1
+
 COMPILER_API_BEGIN
 
 // Simple class to represent which line, column and position (in the array of source contents)
@@ -84,6 +86,10 @@ public:
     auto lex_single_char(char c) noexcept -> result<token, error>;
     auto lex_numeric_literal() noexcept -> result<token, error>;
     auto lex_identifier() noexcept -> result<token, error>;
+    auto lex_string_literal() noexcept -> result<token, error>;
+    auto lex_char_literal() noexcept -> result<token, error>;
+
+    auto lex_escape_character(char c) noexcept -> result<char, error>;
 
     auto move_forward() noexcept -> void;
     auto peek_current() const noexcept -> char;

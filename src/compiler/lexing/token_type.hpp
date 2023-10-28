@@ -47,6 +47,11 @@ enum class token_type {
     LESSER_EQUALS,
     BITWISE_NOT,
     SEMI_COLON,
+    PLUS_PLUS,
+    MINUS_MINUS,
+    MODULO,
+    BITWISE_XOR,
+    XOR_EQUALS,
     END_OF_FILE,
     // represents a nothing token.
     EMPTY,
@@ -54,6 +59,8 @@ enum class token_type {
     IDENTIFIER,
     FLOATING_POINT_LITERAL,
     INTEGER_LITERAL,
+    STRING_LITERAL,
+    CHARACTER_LITERAL,
     // keywords
 
     // https://en.cppreference.com/w/c/language/_Alignas
@@ -61,7 +68,7 @@ enum class token_type {
     // https://en.cppreference.com/w/c/language/_Alignof
     ALIGNOF,
     // no one uses this useless keyword, we will accept it
-    // but it ignore it.
+    // but ignore it.
     AUTO,
     // https://en.cppreference.com/w/c/language/arithmetic_types#Boolean_type
     BOOL,
@@ -231,6 +238,13 @@ inline std::string token_type_to_string(token_type type) {
     case token_type::IDENTIFIER: return "IDENTIFIER";
     case token_type::FLOATING_POINT_LITERAL: return "FLOAT_LITERAL";
     case token_type::INTEGER_LITERAL: return "INTEGER_LITERAL";
+    case token_type::STRING_LITERAL: return "STRING_LITERAL";
+    case token_type::CHARACTER_LITERAL: return "CHARACTER_LITERAL";
+    case token_type::PLUS_PLUS: return "PLUS_PLUS";
+    case token_type::MINUS_MINUS: return "MINUS_MINUS";
+    case token_type::MODULO: return "MODULO";
+    case token_type::BITWISE_XOR: return "BITWISE_XOR";
+    case token_type::XOR_EQUALS: return "XOR_EQUALS";
     }
 
     return "UNKNOWN";

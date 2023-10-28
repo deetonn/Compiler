@@ -12,6 +12,9 @@ auto compiler::lexer::lex_tokens() noexcept -> result<void, error> {
         else {
             auto&& token = std::move(*lex_result.get());
             // discard empty tokens.
+#if LEXER_DEBUG
+            eprintln("[LEXER]: lexed token ({}) at ({})", token.to_string(), get_source_location().to_string());
+#endif
             if (token.type() != token_type::EMPTY) {
                 m_tokens.push_back(token);
             }
@@ -22,13 +25,7 @@ auto compiler::lexer::lex_tokens() noexcept -> result<void, error> {
 }
 
 auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
-    if (is_valid_identifier_char(c)) {
-        return this->lex_identifier();
-    }
-
-    if (is_valid_number_start(c)) {
-        return this->lex_numeric_literal();
-    }
+    println("lexing character ({}) at ({})", c, get_source_location().to_string());
 
     switch (c) {
     case '\n':
@@ -63,6 +60,10 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
             this->move_forward();
             return make_token(token_type::ARROW);
         }
+        if (peek_next() == minus) {
+            this->move_forward();
+            return make_token(token_type::MINUS_MINUS);
+        }
         if (peek_next() == equal) {
             this->move_forward();
             return make_token(token_type::PLUS_EQUAL);
@@ -72,6 +73,10 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         if (peek_next() == equal) {
             this->move_forward();
             return make_token(token_type::PLUS_EQUAL);
+        }
+        if (peek_next() == plus) {
+            this->move_forward();
+            return make_token(token_type::PLUS_PLUS);
         }
         return make_token(token_type::ADD);
     case slash:
@@ -98,8 +103,58 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
             return make_token(token_type::GREATER_EQUALS);
         }
         return make_token(token_type::GREATER_THAN);
+    case equal:
+        if (peek_next() == equal) {
+            this->move_forward();
+            return make_token(token_type::EQUALS_EQUALS);
+        }
+        return make_token(token_type::EQUALS);
+    case ampersand:
+        if (peek_next() == ampersand) {
+            this->move_forward();
+            return make_token(token_type::AND);
+        }
+        return make_token(token_type::AMPERSAND);
+    case pipe:
+        if (peek_next() == pipe) {
+            this->move_forward();
+            return make_token(token_type::OR);
+        }
+        return make_token(token_type::BITWISE_OR);
+    case tilde:
+        return make_token(token_type::BITWISE_NOT);
+    case percent:
+        return make_token(token_type::MODULO);
+    case caret:
+        if (peek_next() == equal) {
+            this->move_forward();
+            return make_token(token_type::XOR_EQUALS);
+        }
+        return make_token(token_type::BITWISE_XOR);
+    case bang:
+        if (peek_next() == equal) {
+            this->move_forward();
+            return make_token(token_type::NOT_EQUAL);
+        }
+        return make_token(token_type::BANG);
     case eof:
         return make_token(token_type::END_OF_FILE);
+    }
+
+    if (is_valid_identifier_char(c)) {
+        return this->lex_identifier();
+    }
+
+    if (is_valid_number_start(c)) {
+        return this->lex_numeric_literal();
+    }
+
+    if (c == double_quote) {
+        return this->lex_string_literal();
+    }
+
+    if (c == single_quote) {
+        return this->lex_char_literal();
     }
 
     return error("unexpected character ({}) at ({})", c, get_source_location().to_string());
@@ -147,10 +202,101 @@ auto compiler::lexer::lex_identifier() noexcept -> result<token, error> {
     return make_token_with_explicit_contents(token_type::IDENTIFIER, std::move(contents));
 }
 
+auto compiler::lexer::lex_string_literal() noexcept -> result<token, error>
+{
+    // expect the current character to be the first double quote.
+    if (peek_current() != double_quote) {
+        return error("expected double quote at ({})", get_source_location().to_string());
+    }
+
+    // move forward to the next character.
+    move_forward();
+
+    std::string contents{}; 
+    while (peek_current() != double_quote) {
+        if (peek_current() == eof) {
+            return error("unexpected end of file while lexing string literal.");
+        }
+        contents.push_back(peek_current());
+        move_forward();
+    }
+
+    // move forward to the next character.
+    move_forward();
+    return make_token_with_explicit_contents(token_type::STRING_LITERAL, std::move(contents));
+}
+
 auto compiler::lexer::move_forward() noexcept -> void {
     m_internals.position++;
     m_internals.column++;
     m_span.end++;
+}
+
+auto compiler::lexer::lex_char_literal() noexcept -> result<token, error>
+{
+    // lex a single character, if the character begins with the escape character, then
+    // we need to lex the next character as well.
+    // TODO: in the future we should support unicode characters.
+
+    // expect the current character to be the first single quote.
+    if (peek_current() != single_quote) {
+        return error("expected single quote at ({})", get_source_location().to_string());
+    }
+
+    // move forward to the next character.
+    move_forward();
+    char contents = peek_current();
+
+    if (contents == '\\') {
+        move_forward();
+        contents = peek_current();
+
+        if (contents == single_quote) {
+            return error("expected escape character after backslash at ({})", get_source_location().to_string());
+        }
+
+        auto escaped_result = lex_escape_character(contents);
+
+        if (escaped_result.is_err())
+            return std::move(*escaped_result.get_err());
+
+        contents = *escaped_result.get();
+    }
+
+    // move forward to the next character.
+    move_forward();
+
+    // expect the current character to be the second single quote.
+    if (peek_current() != single_quote) {
+        return error("expected single quote at ({})", get_source_location().to_string());
+    }
+
+    // move forward to the next character.
+    move_forward();
+
+    return make_token_with_explicit_contents(token_type::CHARACTER_LITERAL, std::string{contents});
+}
+
+auto compiler::lexer::lex_escape_character(char c) noexcept -> result<char, error>
+{
+    switch (c) {
+    case 'n':
+        return '\n';
+    case 'r':
+        return '\r';
+    case 't':
+        return '\t';
+    case '0':
+        return '\0';
+    case '\\':
+        return '\\';
+    case '\'':
+        return '\'';
+    case '\"':
+        return '\"';
+    default:
+        return error("unrecognized escape character ({}) at ({})", c, get_source_location().to_string());
+    }
 }
 
 auto compiler::lexer::make_token_with_explicit_contents(token_type kind, std::string&& content) noexcept -> token
