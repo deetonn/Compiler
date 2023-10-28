@@ -56,6 +56,10 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
     case dot:
         return make_token(token_type::DOT);
     case minus:
+        if (is_valid_number_content(peek_next())) {
+            // let parse_integral_literal() do its thing.
+            break;
+        }
         if (peek_next() == greater_than) {
             this->move_forward();
             return make_token(token_type::ARROW);
@@ -70,6 +74,9 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         }
         return make_token(token_type::MINUS);
     case plus:
+        if (is_valid_number_content(peek_next())) {
+            break;
+        }
         if (peek_next() == equal) {
             this->move_forward();
             return make_token(token_type::PLUS_EQUAL);
@@ -160,11 +167,26 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
     return error("unexpected character ({}) at ({})", c, get_source_location().to_string());
 }
 
+template<class T, typename ...Others>
+bool is_any_of(T val, Others... others) {
+    // if val is ANY of others, return true.
+    return ((val == others) || ...);
+}
+
 auto compiler::lexer::lex_numeric_literal() noexcept -> result<token, error> {
     auto contents = std::string{};
 
     // TODO: Integrals can contain postfixes like "i" or "u" to infer the type. 
     //       Handle these cases.
+
+    if (!is_valid_number_start(peek_current())) {
+        return error("invalid character for the start of an integral literal ({})", peek_current());
+    }
+    else {
+        contents.push_back(peek_current());
+    }
+
+    DISCARD(advance());
 
     char next;
     bool encountered_dot = false;
@@ -177,6 +199,22 @@ auto compiler::lexer::lex_numeric_literal() noexcept -> result<token, error> {
         }
         contents.push_back(next);
         move_forward();
+    }
+
+    next = peek_current();
+
+    if (is_any_of(next, 'f', 'u', 'i', 'l', 'd')) {
+        move_forward();
+        contents.push_back(next);
+        if (is_any_of('f', 'd')) {
+            return make_token_with_explicit_contents(token_type::FLOATING_POINT_LITERAL, std::move(contents));
+        }
+        else {
+            if (encountered_dot) {
+                return error("invalid suffix, cannot use \"{}\" suffix on a floating point number.", next);
+            }
+            return make_token_with_explicit_contents(token_type::INTEGER_LITERAL, std::move(contents));
+        }
     }
 
     if (encountered_dot) {
