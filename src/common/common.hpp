@@ -11,6 +11,8 @@
 #define PREPROCESSOR_API_END }
 
 #define COMPILER_API
+#define NODISCARD [[nodiscard]]
+#define DISCARD(expr) ((void)expr)
 
 #define TODO(msg) std::cerr << "TODO: " msg << '\n'; std::exit(-1)
 
