@@ -34,7 +34,6 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
     case '\n':
         m_internals.line += 1;
         m_internals.column = 0;
-        move_forward();
         return make_token(token_type::EMPTY);
     case '\r':
         if (peek_next() == '\n') {
@@ -45,7 +44,7 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         return make_token(token_type::EMPTY);
     case semi_colon:
         return make_token(token_type::SEMI_COLON);
-    case ' ':
+    case space:
         return make_token(token_type::EMPTY);
     case left_paren:
         return make_token(token_type::LEFT_PAREN);
@@ -126,40 +125,37 @@ auto compiler::lexer::lex_numeric_literal() noexcept -> result<token, error> {
     }
 
     if (encountered_dot) {
-        return make_token(token_type::FLOATING_POINT_LITERAL, true);
+        return make_token_with_explicit_contents(token_type::FLOATING_POINT_LITERAL, std::move(contents));
     }
     else {
-        return make_token(token_type::INTEGER_LITERAL, true);
+        return make_token_with_explicit_contents(token_type::INTEGER_LITERAL, std::move(contents));
     }
 }
 
 auto compiler::lexer::lex_identifier() noexcept -> result<token, error> {
-    auto contents = std::string{};
+    std::string contents{};
 
-    char next;
-    while (true) {
-        next = peek_current();
-        contents.push_back(next);
-
-        if (!is_valid_identifier_char(peek_next())) {
-            break;
-        }
-
+    while (is_valid_identifier_char(peek_current())) {
+        contents.push_back(peek_current());
         move_forward();
     }
 
     if (keywords.contains(contents)) {
-        auto tt = keywords.at(contents);
-        return make_token(tt);
+        return make_token_with_explicit_contents(keywords.at(contents), std::move(contents));
     }
 
-    return make_token(token_type::IDENTIFIER, true);
+    return make_token_with_explicit_contents(token_type::IDENTIFIER, std::move(contents));
 }
 
 auto compiler::lexer::move_forward() noexcept -> void {
     m_internals.position++;
     m_internals.column++;
     m_span.end++;
+}
+
+auto compiler::lexer::make_token_with_explicit_contents(token_type kind, std::string&& content) noexcept -> token
+{
+    return token(kind, m_span, get_source_location(), std::move(content));
 }
 
 auto compiler::lexer::peek_current() const noexcept -> char {
@@ -178,16 +174,29 @@ auto compiler::lexer::peek_next() const noexcept -> char {
     return src.at(m_internals.position + 1);
 }
 
+auto compiler::lexer::advance() noexcept -> char {
+    auto& src = m_source_info.contents();
+    if (m_internals.position + 1 >= src.size()) {
+        return eof;
+    }
+    m_span.end++;
+    return src.at(++m_internals.position);
+}
+
 auto compiler::lexer::make_token(token_type kind, bool use_source) noexcept -> token {
     if (use_source) {
         std::string contents = this->get_current_contents();
         m_internals.position += contents.size();
+        m_internals.column += contents.size();
         m_span.begin = m_span.end;
         return token(kind, m_span, get_source_location(), contents);
     }
     else {
         m_internals.position += 1;
-        m_span.begin = m_span.end;
+        m_internals.column += 1;
+        if (m_span.begin != m_span.end) {
+            m_span.begin = m_span.end;
+        }
         return token(kind, m_span, get_source_location());
     }
 }

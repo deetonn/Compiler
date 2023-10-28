@@ -81,15 +81,17 @@ public:
 
     auto lex_tokens() noexcept -> result<void, error>;
      
-    auto lex_single_char(char c) -> result<token, error>;
-    auto lex_numeric_literal() -> result<token, error>;
-    auto lex_identifier() -> result<token, error>;
+    auto lex_single_char(char c) noexcept -> result<token, error>;
+    auto lex_numeric_literal() noexcept -> result<token, error>;
+    auto lex_identifier() noexcept -> result<token, error>;
 
     auto move_forward() noexcept -> void;
     auto peek_current() const noexcept -> char;
     auto peek_next() const noexcept -> char;
+    auto advance() noexcept -> char;
 
     auto make_token(token_type kind, bool use_source = false) noexcept -> token;
+    auto make_token_with_explicit_contents(token_type kind, std::string&& content) noexcept -> token;
 
     auto get_source_location() noexcept -> source_location;
     auto get_current_contents() const noexcept -> std::string;

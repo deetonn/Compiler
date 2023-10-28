@@ -83,6 +83,7 @@ CONSTANT_CHAR(greater_than, '>');
 CONSTANT_CHAR(lesser_than, '<');
 
 CONSTANT_CHAR(semi_colon, ';');
+CONSTANT_CHAR(space, ' ');
 
 CONSTANT_CHAR(eof, '\0');
 
