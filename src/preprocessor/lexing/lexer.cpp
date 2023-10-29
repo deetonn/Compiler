@@ -4,17 +4,36 @@
 #include <fstream>
 #include <string>
 
-static const std::string single_line_comment = "//";
+static const std::string single_line_comment_entry_token = "//";
+static const std::string multi_line_comment_entry_token = "/*";
+static const std::string multi_line_comment_exit_token = "*/";
 static const std::string include = "#include";
 
 //TODO: support syntax for: # include
 //TODO: make into a class, have member var of output_file_buf
+//TODO: add a two bools in the class to check if currently in a single line comment and multi-line comment
 //TODO: use std::set to keep track of how many files have already been preprocessed
 //TODO: change return types to be <result, error>
 //TODO: append intermediate file buf to output_file buf if preprocessed
 //TODO: add more preprocessing functionality
 
 PREPROCESSOR_API_BEGIN
+
+[[nodiscard]]
+auto process_multi_line_comment(std::fstream& file) -> bool {
+    while (!file.eof()) {
+        std::string line;
+        std::getline(file, line);
+
+        if (line.find(multi_line_comment_exit_token) != std::string::npos) {
+            //TODO: remove intermediate buffer from entry token to exit token
+
+            return true; // found exit token
+        }
+    }
+
+    return false;
+}
 
 [[nodiscard]]
 auto copy_file_contents(const std::string& path) -> std::string {
@@ -27,7 +46,7 @@ auto copy_file_contents(const std::string& path) -> std::string {
 
 [[nodiscard]]
 auto process_include(const std::string& line) -> bool {
-    bool found_opening_token {};
+    bool found_entry_token {};
     std::string path;
     std::string escape_token;
 
@@ -35,17 +54,17 @@ auto process_include(const std::string& line) -> bool {
         if (line[i] == ' ')
             continue; // ignore white space
 
-        // search for opening token
-        if (!found_opening_token) {
+        // search for entry token
+        if (!found_entry_token) {
             switch (line[i]) {
                 case '<':
                     escape_token = ">";
-                    found_opening_token = true;
+                    found_entry_token = true;
                 continue; // iterate to next index safely
  
                 case '\"':
                     escape_token = "\"";
-                    found_opening_token = true;
+                    found_entry_token = true;
                 continue; // iterate to next index safely
 
                 default:
@@ -53,10 +72,10 @@ auto process_include(const std::string& line) -> bool {
             }
         }
 
-        // search for escape token
+        // search for exit token
         auto pos = line.find(escape_token, i);
         if (pos == std::string::npos) {
-            return false; // escape token not found
+            return false; // exit token not found
         }
 
         // capture the file path
@@ -76,15 +95,27 @@ auto preprocess(const std::string& path) -> void {
         std::string line;
         std::getline(file, line);
 
-        // remove comments
-        if (auto pos = line.find(single_line_comment); pos != std::string::npos) {
+        // remove single line comments
+        if (auto pos = line.find(single_line_comment_entry_token); pos != std::string::npos) {
             if (pos == 0) {
                 line = "";
-                return; // comment is removed, line is now empty
+                continue; // comment is removed, line is now empty
             }
 
             // comment is removed, line contains code
             line.resize(pos - 1);
+        }
+
+        // remove multi-line comments
+        if (auto entry_pos = line.find(multi_line_comment_entry_token); entry_pos != std::string::npos) {
+            // check if entry token and exit token are on the same line
+            if (auto exit_pos = line.find(multi_line_comment_exit_token, entry_pos + multi_line_comment_entry_token.length()); exit_pos != std::string::npos) {
+                // remove substring from string
+                line.erase(entry_pos, exit_pos + 1);
+            }
+
+            // iterate over each line until an exit token is found
+            process_multi_line_comment(file); 
         }
 
         if (auto pos = line.find(include); pos != std::string::npos) {
