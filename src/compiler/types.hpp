@@ -157,6 +157,12 @@ public:
         m_kind = kind;
         (m_flags.set(flags, true), ...);
     }
+    inline explicit type_information(const std::string& name, type_kind kind, std::bitset<mod_count>&& flags)
+    {
+        m_name = name;
+        m_kind = kind;
+        m_flags = std::move(flags);
+    }
 
     inline auto has_valid_modifiers() const noexcept -> result<void, error> {
         // avoid cases like "unsigned signed int"

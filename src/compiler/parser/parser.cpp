@@ -119,6 +119,12 @@ COMPILER_API optional<reference_wrapper<const compiler::token>> compiler::parser
     return std::cref(m_tokens.at(m_pos + 1));
 }
 
+#define PARSE_FAILURE(diagnostic)         \
+    auto diag = diagnostic;               \
+    auto e = error("{}", diag.message()); \
+    push_diagnostic(std::move(diag));     \
+    return e;
+
 COMPILER_API result<compiler::type_information, error> compiler::parser::parse_typename() noexcept {
     auto modifiers = std::bitset<type_modifier::mod_count>{};
     std::optional<std::reference_wrapper<const token>> next;
@@ -143,12 +149,31 @@ COMPILER_API result<compiler::type_information, error> compiler::parser::parse_t
                 modifiers.set(mod_short, false);
                 modifiers.set(mod_short_int, true);        
             }
+            else if (modifiers.test(mod_long)) {
+                if (modifiers.test(mod_long_int) || modifiers.test(mod_long_long_int)) {
+                    PARSE_FAILURE(make_diag_builder()
+                        .with_level(diag_level::error)
+                        .with_location(next.value().get().location())
+                        .with_message("invalid type specifiers")
+                        .with_note("got `int` after `long int` or `long long int` was already specified.")
+                        .build());
+                }
+                else if (modifiers.test(mod_long_long)) {
+                    modifiers.set(mod_long_long, false);
+                    modifiers.set(mod_long_long_int, true);        
+                }
+                else if (modifiers.test(mod_long)) {
+                    modifiers.set(mod_long, false);
+                    modifiers.set(mod_long_int);        
+                }
+                break;
+            }
             else if (modifiers.test(mod_int)) {
-                auto diag = make_diag_builder()
+                PARSE_FAILURE(make_diag_builder()
                     .with_level(diag_level::error)
                     .with_location(next.value().get().location())
                     .with_message("invalid type modifiers. (cannot have `int int`)")
-                    .build();        
+                    .build());        
             }
             else {
                 modifiers.set(mod_int, true);        
@@ -156,14 +181,46 @@ COMPILER_API result<compiler::type_information, error> compiler::parser::parse_t
             break;
         case tt::SHORT:
             if (modifiers.test(mod_short)) {
-                push_diagnostic(make_diag_builder()
+                PARSE_FAILURE(make_diag_builder()
                     .with_level(diag_level::error)
                     .with_location(next.value().get().location())
                     .with_message("invalid type modifiers. (cannot have `short short`)")
                     .build());
             }
+            modifiers.set(mod_short);
+            break;
+        case tt::LONG:
+            if (modifiers.test(mod_long)) {                    
+                if (!modifiers.test(mod_long_long)) {
+                    modifiers.set(mod_long, false);
+                    modifiers.set(mod_long_long, true);
+                    break;  
+                }
+                PARSE_FAILURE(make_diag_builder()
+                    .with_level(diag_level::error)
+                    .with_location(next.value().get().location())
+                    .with_message("invalid type modifiers. (cannot have `long long long`)")
+                    .build());
+            }
+            else if (!modifiers.test(mod_long_long)) {
+                modifiers.set(mod_long);        
+            }
+            else {
+                PARSE_FAILURE(make_diag_builder()
+                    .with_level(diag_level::error)
+                    .with_location(next.value().get().location())
+                    .with_message("invalid type specifiers. (cannot have `long long long`)")
+                    .build());   
+            }
+            break;
         }
     }
 
-    return error("no typename");
+    // TODO: handle multiple pointers.
+    // NOTE: Something like `char** argv`
+    if (matches(tt::STAR)) {
+        modifiers.set(mod_pointer);
+    }
+
+    return type_information("integral", type_kind::integral, std::move(modifiers));
 }

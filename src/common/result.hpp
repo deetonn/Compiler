@@ -48,7 +48,6 @@ private:
   std::variant<std::nullptr_t, E> m_variant;
 public:
   static_assert(std::is_move_assignable<E>::value, "result<void, E>: E must be move assignable.");
-
   inline result()
     : m_variant{nullptr}
   {}
