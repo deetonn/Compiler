@@ -96,6 +96,7 @@ public:
     }
 };
 
+// A type modifier, something that changes the semantics of a type.
 enum type_modifier {
   mod_const,
   mod_unsigned,
@@ -104,9 +105,12 @@ enum type_modifier {
   mod_static,
   mod_extern,
   mod_pointer,
+
+  // not included, just for the size of a bitset 
   mod_count  
 };
 
+// Describes what kind of type a type is.
 enum type_kind {
     // Any builtin type, stuff like pointers, integrals.
     integral,
@@ -176,6 +180,8 @@ public:
         return type_information(name, type_kind::aggregate, flags...);
     }
 };
+
+using identifier = std::string;
 
 COMPILER_API_END
 

@@ -3,11 +3,16 @@
 
 #include "../../common/common.hpp"
 
+#include "prod/assignment.hpp"
+
 COMPILER_API_BEGIN
+
+// for now, until I know what these should return.
+using visitor_result = void;
 
 class ast_visitor {
 public:
-
+    virtual visitor_result visit_assignment(assignment& node) = 0;
 };
 
 COMPILER_API_END

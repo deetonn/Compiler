@@ -3,10 +3,12 @@
 
 #include "../../../common/common.hpp"
 #include "../../types.hpp"
-#include "../visitor.hpp"
+
+class ast_visitor;
 
 COMPILER_API_BEGIN
 
+// The very base class of all AST nodes.
 class ast_node {
 public:
     virtual ~ast_node() = default;
@@ -15,9 +17,12 @@ public:
     virtual const source_location& location() const noexcept = 0;
 };
 
-class expression : public ast_node {
-  
-};
+// The base class of all AST nodes that represent an expression.
+class expression : public ast_node {};
+// The base class of all AST nodes that represent a statement.
+class statement : public ast_node {};
+// The base class of all AST nodes that represent a declaration.
+class declaration : public ast_node {};
 
 COMPILER_API_END
 

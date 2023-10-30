@@ -1,5 +1,6 @@
 #include "preprocessor/lexing/lexer.hpp"
 #include "compiler/lexing/lexer.hpp"
+#include "compiler/parser/prod/node.hpp"
 #include <iostream>
 #include <format>
 
