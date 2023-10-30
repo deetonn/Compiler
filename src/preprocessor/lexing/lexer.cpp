@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "constants.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -22,6 +23,8 @@ PREPROCESSOR_API_BEGIN
 lexer::lexer() 
   : m_preprocessed{}
   , m_buffer{}
+  , m_is_single_line_comment{}
+  , m_is_multi_line_comment{}
 {}
 
 [[nodiscard]]
@@ -93,8 +96,66 @@ auto lexer::process_include(const std::string& line) -> bool {
     return false;
 }
 
-auto lexer::preprocess_line(const std::string& line ) -> bool {
+auto lexer::trim_leading_whitespace(std::string& line) -> void {
+    auto pos = line.find_first_not_of(' ');
+    if (pos == std::string::npos) {
+        line = "";
+        return; // line contains no non-whitespace characters
+    }
 
+    line = line.substr(pos);
+}
+
+auto lexer::lex_directive(const std::string& line) -> bool {
+    std::string buffer = "";
+    for (const auto ch : line) {
+        if (!is_valid_directive_char(ch)) {
+            if (buffer.length() > 0) {
+                break;
+            }
+        }
+
+        buffer += ch;
+    }
+
+    return tokens.contains(buffer);
+}
+
+auto lexer::lex_tokens(const std::string& line) -> bool {
+    trim_leading_whitespace(line);
+
+    for (std::size_t i = 0; i < line.length(); ++i) {
+        if (line[i] == ' ')
+            continue; // ignore whitespace
+
+        // preprocessor directive
+        if (line[i] == '#') {
+            if (i + 1 >= line.length())
+                return false; // error
+
+            lex_directive(line.substr(i + 1));
+        }
+    }
+
+
+
+    // remove multi-line comments
+    if (auto entry_pos = line.find(multi_line_comment_entry_token); entry_pos != std::string::npos) {
+        // check if entry token and exit token are on the same line
+        if (auto exit_pos = line.find(multi_line_comment_exit_token, entry_pos + multi_line_comment_entry_token.length()); exit_pos != std::string::npos) {
+            // remove substring from string
+            line.erase(entry_pos, exit_pos + 1);
+        }
+
+        // iterate over each line until an exit token is found
+        process_multi_line_comment(file); 
+    }
+
+    if (auto pos = line.find(include); pos != std::string::npos) {
+        process_include(line.substr(pos + include.length())); 
+    }
+
+    return false;
 }
 
 auto lexer::preprocess(const std::string& path) -> void {
@@ -108,32 +169,7 @@ auto lexer::preprocess(const std::string& path) -> void {
         std::string line;
         std::getline(file, line);
 
-        // remove single line comments
-        if (auto pos = line.find(single_line_comment_entry_token); pos != std::string::npos) {
-            if (pos == 0) {
-                line = "";
-                continue; // comment is removed, line is now empty
-            }
-
-            // comment is removed, line contains code
-            line.resize(pos - 1);
-        }
-
-        // remove multi-line comments
-        if (auto entry_pos = line.find(multi_line_comment_entry_token); entry_pos != std::string::npos) {
-            // check if entry token and exit token are on the same line
-            if (auto exit_pos = line.find(multi_line_comment_exit_token, entry_pos + multi_line_comment_entry_token.length()); exit_pos != std::string::npos) {
-                // remove substring from string
-                line.erase(entry_pos, exit_pos + 1);
-            }
-
-            // iterate over each line until an exit token is found
-            process_multi_line_comment(file); 
-        }
-
-        if (auto pos = line.find(include); pos != std::string::npos) {
-           process_include(line.substr(pos + include.length())); 
-        }
+        preprocess_line(line);
     }
 
 }

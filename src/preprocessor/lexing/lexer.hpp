@@ -13,6 +13,8 @@ class lexer {
 private:
     std::unordered_set<std::string> m_preprocessed;
     std::vector<std::string>        m_buffer;
+    bool                            m_is_single_line_comment;
+    bool                            m_is_multi_line_comment;
 
 public:
     lexer();
@@ -25,6 +27,12 @@ public:
 
     [[nodiscard]]
     auto process_include(const std::string& line) -> bool;
+
+    [[nodiscard]]
+    auto lex_comment(const std::string& line) -> bool;
+
+    [[nodiscard]]
+    auto lex_tokens(const std::string& line) -> bool;
 
     auto preprocess(const std::string& path) -> void;
 };

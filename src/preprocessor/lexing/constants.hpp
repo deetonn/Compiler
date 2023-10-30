@@ -4,13 +4,14 @@
 #include "../../common/common.hpp"
 #include "token_type.hpp"
 
+#include <cctype>
 #include <unordered_map>
 
 PREPROCESSOR_API_BEGIN
 
 // C preprocessor tokens
 // TODO: some tokens may be missing, and some may not be part of the standard
-static constexpr std::unordered_map<std::string, token_type> tokens = {
+static inline const std::unordered_map<std::string, token_type> tokens = {
         // standard preprocessor operators
       { "#",                    token_type::HASHTAG },
 
@@ -53,6 +54,18 @@ static constexpr std::unordered_map<std::string, token_type> tokens = {
       { "/*",                   token_type::MULTI_LINE_COMMENT_ENTRY },
       { "*/",                   token_type::MULTI_LINE_COMMENT_EXIT }
 };
+
+inline auto is_valid_directive_char(char ch) noexcept -> bool {
+    return (ch == '#' || std::isalpha(ch));
+}
+
+inline auto is_valid_predefined_macro(char ch) noexcept -> bool {
+    return (ch == '_' || std::isalpha(ch));
+}
+
+inline auto is_valid_comment_char(char ch) noexcept -> bool {
+    return (ch == '/' || ch == '*');
+}
 
 PREPROCESSOR_API_END
 

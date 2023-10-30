@@ -86,9 +86,11 @@ inline std::string token_type_to_string(const token_type type) {
         case token_type::MULTI_LINE_COMMENT_ENTRY:  return "MULTI_LINE_COMMENT_ENTRY";
         case token_type::MULTI_LINE_COMMENT_EXIT:   return "MULTI_LINE_COMMENT_EXIT";
 
-        default:                                return "UNKNOWN";
+        default:                                    return "UNKNOWN";
     }
 }
+
+
 
 PREPROCESSOR_API_END
 
