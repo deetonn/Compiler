@@ -1,7 +1,11 @@
 
+#include <optional>
 #ifndef _COMPILER_PARSER_HPP
 
 #include "../../common/common.hpp"
+#include "../../common/result.hpp"
+#include "../../common/error.hpp"
+
 #include "../types.hpp"
 #include "prod/node.hpp"
 
@@ -32,12 +36,22 @@ public:
         : m_tokens(std::move(tokens))
     {}
 
+    COMPILER_API void parse(const std::vector<std::string>& src) noexcept;
+    COMPILER_API void parse_next() noexcept;  
+
+    COMPILER_API result<type_information, error> parse_typename() noexcept;
+
 private:
     // check if the current token is of type "tok"
     COMPILER_API bool matches(token_type tok) const noexcept;
     COMPILER_API std::optional<std::reference_wrapper<token>> expect(token_type type, diagnostic&& diag) noexcept;
 
-    COMPILER_API void push_diagnostic(diagnostic&& diag) noexcept;
+    COMPILER_API bool seq_looks_like_typename() const noexcept;
+
+    COMPILER_API std::optional<std::reference_wrapper<const token>> peek_next() const noexcept;
+    COMPILER_API std::optional<std::reference_wrapper<const token>> peek() const noexcept;
+
+    COMPILER_API error push_diagnostic(diagnostic&& diag) noexcept;
 };
 
 COMPILER_API_END

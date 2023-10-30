@@ -1,4 +1,11 @@
 #include "parser.hpp"
+#include "../types.hpp"
+
+#include "../lexing/token_type.hpp"
+
+#include "../../common/io.hpp"
+#include <memory>
+#include <optional>
 
 using std::optional;
 using std::reference_wrapper;
@@ -26,7 +33,137 @@ COMPILER_API optional<reference_wrapper<compiler::token>> compiler::parser::expe
     return std::ref(m_tokens.at(m_pos));
 }
 
-COMPILER_API void compiler::parser::push_diagnostic(diagnostic&& diag) noexcept
+COMPILER_API error compiler::parser::push_diagnostic(diagnostic&& diag) noexcept
 {
+    auto ret = error("{}", diag.message());
     m_diags.push_back(std::move(diag));
+    return ret;
+}
+
+COMPILER_API void compiler::parser::parse(const std::vector<std::string>& src) noexcept
+{
+    while (!matches(token_type::END_OF_FILE)) {
+        this->parse_next();
+    }
+    // After parsing has been done, check if there are any diagnostics.
+
+    if (m_diags.empty()) {
+        return;
+    }
+
+    for (const auto& diagnostic : m_diags) {
+        eprintln("{}", diagnostic.build_into_message(src));
+    }
+}
+
+COMPILER_API void compiler::parser::parse_next() noexcept 
+{
+    if (seq_looks_like_typename()) {
+        
+    }
+}
+
+template<class T>
+bool is_any_of(T left, auto... right) noexcept {
+    return ((left == right) || ...);
+}
+
+COMPILER_API bool compiler::parser::seq_looks_like_typename() const noexcept
+{
+    const auto maybe_next_token = this->peek();
+
+    if (!maybe_next_token.has_value()) {
+        return false;
+    }
+
+    using tt = token_type;
+    const auto& token = maybe_next_token.value().get();
+
+    if (is_any_of(token.type(),
+        tt::SIGNED, tt::UNSIGNED, tt::CHAR,
+        tt::SHORT, tt::INT, tt::LONG, 
+        tt::VOLATILE, tt::STATIC, tt::REGISTER,
+        tt::VOID))
+    {
+        return true;
+    }
+
+    if (is_any_of(token.type(), tt::STRUCT)) {
+        return true;
+    }
+
+    if (is_any_of(token.type(), tt::IDENTIFIER)) {
+        return true;
+    }
+
+    if (is_any_of(token.type(), tt::ENUM)) {
+        return true;
+    }
+
+    return false;
+} 
+
+COMPILER_API optional<reference_wrapper<const compiler::token>> compiler::parser::peek() const noexcept {
+    if (m_tokens.size() > m_pos) {
+        return std::nullopt;
+    }
+
+    return std::cref(m_tokens.at(m_pos));
+} 
+
+COMPILER_API optional<reference_wrapper<const compiler::token>> compiler::parser::peek_next() const noexcept {
+    if (m_tokens.size() > (m_pos + 1)) {
+        return std::nullopt;
+    }
+
+    return std::cref(m_tokens.at(m_pos + 1));
+}
+
+COMPILER_API result<compiler::type_information, error> compiler::parser::parse_typename() noexcept {
+    auto modifiers = std::bitset<type_modifier::mod_count>{};
+    std::optional<std::reference_wrapper<const token>> next;
+    using tt = token_type;
+
+    while ((next = peek())) {
+        switch (next.value().get().type()) {
+        case tt::UNSIGNED:
+            modifiers.set(mod_unsigned);
+            break;
+        case tt::SIGNED:
+            modifiers.set(mod_signed);
+            break;
+        case tt::EXTERN:
+            modifiers.set(mod_extern);
+            break;
+        case tt::VOLATILE:
+            modifiers.set(mod_volatile);
+            break;
+        case tt::INT:
+            if (modifiers.test(mod_short)) {
+                modifiers.set(mod_short, false);
+                modifiers.set(mod_short_int, true);        
+            }
+            else if (modifiers.test(mod_int)) {
+                auto diag = make_diag_builder()
+                    .with_level(diag_level::error)
+                    .with_location(next.value().get().location())
+                    .with_message("invalid type modifiers. (cannot have `int int`)")
+                    .build();        
+            }
+            else {
+                modifiers.set(mod_int, true);        
+            }
+            break;
+        case tt::SHORT:
+            if (modifiers.test(mod_short)) {
+                push_diagnostic(make_diag_builder()
+                    .with_level(diag_level::error)
+                    .with_location(next.value().get().location())
+                    .with_message("invalid type modifiers. (cannot have `short short`)")
+                    .build());
+            }
+        }
+    }
+
+    return error("no typename");
 }

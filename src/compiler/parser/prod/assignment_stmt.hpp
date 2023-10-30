@@ -17,14 +17,14 @@ COMPILER_API_BEGIN
   NOTE: I'm not sure if this should be classes as a declaration or not.
 */
 
-class assignment_statement : public statement {
+class assignment_declaration : public declaration {
 private:
   type_information m_type_info;
   identifier m_identifier;
   source_location m_source_location;
   std::optional<std::unique_ptr<expression>> m_expr;
 public:
-  COMPILER_API inline explicit assignment_statement(
+  COMPILER_API inline explicit assignment_declaration(
       const type_information& type,
       const identifier& identifier,
       const source_location& location,
@@ -40,7 +40,7 @@ public:
   }
 
   inline virtual void accept(ast_visitor& visitor) noexcept {
-      return visitor.visit_assignment_statement(*this);          
+      return visitor.visit_assignment_declaration(*this);          
   } 
 
   inline virtual const source_location& location() const noexcept {

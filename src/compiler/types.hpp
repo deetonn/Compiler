@@ -95,9 +95,9 @@ public:
             return std::format("Token({}) [{}] at ({})",
                 token_type_to_string(type()),
                 content,
-                source_location().to_string());
+                location().to_string());
         }
-        return std::format("Token({}) at ({})", token_type_to_string(type()), source_location().to_string());
+        return std::format("Token({}) at ({})", token_type_to_string(type()), location().to_string());
     }
 };
 
@@ -196,7 +196,7 @@ public:
 
 using identifier = std::string;
 
-static inline constexpr std::array<identifier, 12> type_specifiers = {
+static inline std::array<identifier, 12> type_specifiers = {
     "unsigned", "signed", "char", "short", "int", "long", "float",
     "double", "volatile", "extern", "static", "register"  
 };
