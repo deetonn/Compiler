@@ -5,4 +5,8 @@ project(Compiler)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} "src/compiler/lexing/lexer.cpp")
+add_executable(${PROJECT_NAME} ${SOURCES} 
+    "src/compiler/lexing/lexer.cpp" 
+    "src/compiler/parser/parser.cpp"
+    "src/compiler/diagnostics/diag.cpp"
+)
