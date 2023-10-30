@@ -25,8 +25,6 @@ auto compiler::lexer::lex_tokens() noexcept -> result<void, error> {
 }
 
 auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
-    println("lexing character ({}) at ({})", c, get_source_location().to_string());
-
     switch (c) {
     case '\n':
         m_internals.line += 1;
@@ -61,7 +59,7 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         return make_token(token_type::DOT);
     case minus:
         if (is_valid_number_content(peek_next())) {
-            // let parse_integral_literal() do its thing.
+            // NOTE: This check does nothing. We need more context.
             break;
         }
         if (peek_next() == greater_than) {
@@ -79,6 +77,7 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         return make_token(token_type::MINUS);
     case plus:
         if (is_valid_number_content(peek_next())) {
+            // NOTE: This check does nothing. We need more context.
             break;
         }
         if (peek_next() == equal) {

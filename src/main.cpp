@@ -35,10 +35,11 @@ int main(int argc, char** argv) {
     }
 
     auto tokens = lexer.release_tokens();
-
+#if LEXER_DEBUG
     for (auto& token : tokens) {
         println("{}", token.to_string());
     }
+#endif
 
     return 0;
 }

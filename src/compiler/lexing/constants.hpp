@@ -13,7 +13,7 @@ COMPILER_API_BEGIN
 // All C keywords. 
 // NOTE: This is static and global, which is usually an issue but this is readonly.
 // NOTE: It should never change or be modified, which makes it fine for this use case.
-static const std::unordered_map<std::string, token_type> keywords = {
+static const inline std::unordered_map<std::string, token_type> keywords = {
       { "alignas", token_type::ALIGNAS },
       { "alignof", token_type::ALIGNOF },
       { "auto", token_type::AUTO },
