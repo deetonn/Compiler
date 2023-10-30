@@ -96,23 +96,6 @@ public:
     }
 };
 
-// The amount of possible modifiers are:
-// 1. const
-// 2. unsigned
-// 3. signed
-// 4. volatile
-// 5. static
-// 6. extern
-static constexpr size_t FLAG_COUNT = 7;
-
-static constexpr size_t FLAG_CONST = 0;
-static constexpr size_t FLAG_UNSIGNED = 1;
-static constexpr size_t FLAG_SIGNED = 2;
-static constexpr size_t FLAG_VOLATILE = 3;
-static constexpr size_t FLAG_STATIC = 4;
-static constexpr size_t FLAG_EXTERN = 5;
-static constexpr size_t FLAG_POINTER = 6;
-
 enum type_modifier {
   mod_const,
   mod_unsigned,
@@ -124,17 +107,42 @@ enum type_modifier {
   mod_count  
 };
 
+enum type_kind {
+    // Any builtin type, stuff like pointers, integrals.
+    integral,
+    // A struct, union or enum.
+    aggregate,
+};
+
+/*
+  My idea with type information is that you have the main type, something like "int" or "long".
+  
+  Then, you also have modifiers, which is anything not related to the type itself, but related to
+  semantics around it or storage specifiers.
+
+  For example, "const int" is a type with a modifier, "const". "const" is not a type, but it is a modifier
+  that changes the semantics of the type.
+
+  Therefore we just store them as flags, and we can check if a type has a modifier by checking if the flag is set,
+  instead of complicating it all.
+*/
+
+// Holds all possible information about a givens type information. 
 class type_information {
 private:
     std::string m_name;
     std::bitset<mod_count> m_flags;
+    type_kind m_kind;
 public:
-    inline explicit type_information(const std::string& name, auto... flags) noexcept {
+    type_information() = delete;
+    inline explicit type_information(const std::string& name, type_kind kind, auto... flags) noexcept {
         m_name = name;
+        m_kind = kind;
         (m_flags.set(flags, true), ...);
     }
 
     inline auto has_valid_modifiers() const noexcept -> result<void, error> {
+        // avoid cases like "unsigned signed int"
         if (m_flags.test(mod_unsigned) && m_flags.test(mod_signed)) {
             return error("(signed/unsigned mismatch) type cannot be signed & unsigned");
         }
@@ -147,15 +155,25 @@ public:
 
         return {};
     }
-
     inline auto is_integral() const noexcept -> bool {
-        if (m_name == "int") return true;
-        if (m_name == "long") return true;
-        if (m_name == "long long") return true;
-        if (m_name == "short") return true;
-        if (m_name == "float") return true;
-        if (m_name == "char") return true;
-        return false;
+        return m_kind == type_kind::integral;
+    }
+
+    inline auto name() const noexcept -> const std::string& {
+        return m_name;
+    }
+    inline auto has_modifier(type_modifier mod) const noexcept -> bool {
+        return m_flags.test(mod);
+    }
+    inline auto kind() const noexcept -> type_kind {
+        return m_kind;
+    }
+
+    static inline type_information new_integral(const std::string& name, auto... flags) noexcept {
+        return type_information(name, type_kind::integral, flags...);
+    }
+    static inline type_information new_aggregate(const std::string& name, auto... flags) noexcept {
+        return type_information(name, type_kind::aggregate, flags...);
     }
 };
 

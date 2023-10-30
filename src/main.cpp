@@ -22,8 +22,6 @@ int main(int argc, char** argv) {
         FAIL("invalid source file provided. ({})", source_info.get_err()->what());
     }
 
-    auto t = compiler::type_information("long", compiler::mod_const);
-
     auto src = *source_info.get();
     // NOTE: If you are to preprocess, do it here.
     //       "src" is a std::string with the file contents.
