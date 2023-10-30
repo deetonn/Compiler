@@ -10,7 +10,7 @@ PREPROCESSOR_API_BEGIN
 
 // C preprocessor tokens
 // TODO: some tokens may be missing, and some may not be part of the standard
-static const std::unordered_map<std::string, token_type> tokens = {
+static constexpr std::unordered_map<std::string, token_type> tokens = {
         // standard preprocessor operators
       { "#",                    token_type::HASHTAG },
 
@@ -46,7 +46,12 @@ static const std::unordered_map<std::string, token_type> tokens = {
       { "__STDC_NO_COMPLEX__",  token_type::STDC_NO_COMPLEX },
       { "__STDC_NO_THREADS__",  token_type::STDC_NO_THREADS },
       { "__STDC_NO_VLA__",      token_type::STDC_NO_VLA },
-      { "__STDC_VERSION__",     token_type::STDC_VERSION }
+      { "__STDC_VERSION__",     token_type::STDC_VERSION },
+
+        // comments
+      { "//",                   token_type::SINGLE_LINE_COMMENT },
+      { "/*",                   token_type::MULTI_LINE_COMMENT_ENTRY },
+      { "*/",                   token_type::MULTI_LINE_COMMENT_EXIT }
 };
 
 PREPROCESSOR_API_END

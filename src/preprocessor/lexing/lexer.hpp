@@ -4,6 +4,7 @@
 #include "../../common/common.hpp"
 
 #include <string>
+#include <vector>
 #include <unordered_set>
 
 PREPROCESSOR_API_BEGIN
@@ -11,6 +12,7 @@ PREPROCESSOR_API_BEGIN
 class lexer {
 private:
     std::unordered_set<std::string> m_preprocessed;
+    std::vector<std::string>        m_buffer;
 
 public:
     lexer();
