@@ -21,6 +21,7 @@ PREPROCESSOR_API_BEGIN
 
 lexer::lexer() 
   : m_preprocessed{}
+  , m_buffer{}
 {}
 
 [[nodiscard]]
@@ -90,7 +91,11 @@ auto lexer::process_include(const std::string& line) -> bool {
     }
 
     return false;
-} 
+}
+
+auto lexer::preprocess_line(const std::string& line ) -> bool {
+
+}
 
 auto lexer::preprocess(const std::string& path) -> void {
     if (m_preprocessed.contains(path))
