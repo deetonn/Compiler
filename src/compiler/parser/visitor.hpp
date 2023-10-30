@@ -3,9 +3,9 @@
 
 #include "../../common/common.hpp"
 
-#include "prod/assignment.hpp"
-
 COMPILER_API_BEGIN
+
+class assignment;
 
 // for now, until I know what these should return.
 using visitor_result = void;

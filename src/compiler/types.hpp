@@ -52,6 +52,10 @@ public:
     static inline source_location from(std::string file, std::size_t line, std::size_t col) noexcept {
         return source_location(file, line, col);
     }
+
+    static inline source_location invalid() noexcept {
+        return source_location("(invalid)", 0, 0);
+    }
 };
 
 // A token formed from lexical analysis.

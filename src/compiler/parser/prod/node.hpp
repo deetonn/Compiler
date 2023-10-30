@@ -18,11 +18,35 @@ public:
 };
 
 // The base class of all AST nodes that represent an expression.
-class expression : public ast_node {};
+class expression : public ast_node {
+public:
+    virtual ~expression() = default;
+    virtual void accept(ast_visitor& visitor) {}
+
+    virtual const source_location& location() const noexcept {
+        return source_location::invalid();
+    }
+};
 // The base class of all AST nodes that represent a statement.
-class statement : public ast_node {};
+class statement : public ast_node {
+public:
+    virtual ~statement() = default;
+    virtual void accept(ast_visitor& visitor) {}
+
+    virtual const source_location& location() const noexcept {
+        return source_location::invalid();
+    }
+};
 // The base class of all AST nodes that represent a declaration.
-class declaration : public ast_node {};
+class declaration : public ast_node {
+public:
+    virtual ~declaration() = default;
+    virtual void accept(ast_visitor& visitor) {}
+
+    virtual const source_location& location() const noexcept {
+        return source_location::invalid();
+    }
+};
 
 COMPILER_API_END
 

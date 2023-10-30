@@ -6,7 +6,10 @@
 
 #include "../../../common/common.hpp"
 #include "../../types.hpp"
+
 #include "node.hpp"
+
+#include "../visitor.hpp"
 
 COMPILER_API_BEGIN
 
@@ -20,19 +23,26 @@ private:
     identifier m_assignee;
     type_information m_type_info;
     std::optional<std::unique_ptr<ast_node>> m_expr;
+    source_location m_location;
 public:
     COMPILER_API inline assignment(
         const type_information& typeinfo,
         const identifier& assignee,
-        std::optional<std::unique_ptr<ast_node>> expr = std::nullopt) noexcept
-    : m_type_info(typeinfo)
+        const source_location& location,
+        std::optional<std::unique_ptr<ast_node>> expr = std::nullopt
+    ) noexcept 
+        : m_type_info(typeinfo)
+        , m_location(location)
     {
         m_assignee = assignee;
         m_expr = std::move(expr);
     }
 
-    virtual COMPILER_API void accept(ast_visitor& vis) override {
+    virtual COMPILER_API void accept(ast_visitor& vis)  {
         return vis.visit_assignment(*this);
+    }
+    virtual COMPILER_API const source_location& location() const noexcept override {
+        return m_location;
     }
 
     COMPILER_API inline const identifier& assignee() const noexcept {
