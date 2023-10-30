@@ -10,6 +10,13 @@
 
 COMPILER_API_BEGIN
 
+/*
+  This is an actual assignment, something such as:
+  "int a = 2;"
+
+  NOTE: I'm not sure if this should be classes as a declaration or not.
+*/
+
 class assignment_statement : public statement {
 private:
   type_information m_type_info;
