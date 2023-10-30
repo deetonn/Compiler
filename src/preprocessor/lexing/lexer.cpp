@@ -19,8 +19,12 @@ static const std::string include = "#include";
 
 PREPROCESSOR_API_BEGIN
 
+lexer::lexer() 
+  : m_preprocessed{}
+{}
+
 [[nodiscard]]
-auto process_multi_line_comment(std::fstream& file) -> bool {
+auto lexer::process_multi_line_comment(std::fstream& file) -> bool {
     while (!file.eof()) {
         std::string line;
         std::getline(file, line);
@@ -36,7 +40,7 @@ auto process_multi_line_comment(std::fstream& file) -> bool {
 }
 
 [[nodiscard]]
-auto copy_file_contents(const std::string& path) -> std::string {
+auto lexer::copy_file_contents(const std::string& path) -> std::string {
     std::fstream file(path);
     std::istringstream iss;
     iss >> file.rdbuf();
@@ -45,7 +49,7 @@ auto copy_file_contents(const std::string& path) -> std::string {
 }
 
 [[nodiscard]]
-auto process_include(const std::string& line) -> bool {
+auto lexer::process_include(const std::string& line) -> bool {
     bool found_entry_token {};
     std::string path;
     std::string escape_token;
@@ -86,9 +90,13 @@ auto process_include(const std::string& line) -> bool {
     }
 
     return false;
-}
+} 
 
-auto preprocess(const std::string& path) -> void {
+auto lexer::preprocess(const std::string& path) -> void {
+    if (m_preprocessed.contains(path))
+        return;
+
+    m_preprocessed.insert(path);
     std::fstream file(path);
 
     while (!file.eof()) {
