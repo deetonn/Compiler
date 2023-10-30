@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "constants.hpp"
 
 auto compiler::lexer::lex_tokens() noexcept -> result<void, error> {
     while (m_internals.position <= m_source_info.contents().size()) {
@@ -59,8 +60,7 @@ auto compiler::lexer::lex_single_char(char c) noexcept -> result<token, error> {
         return make_token(token_type::DOT);
     case minus:
         if (is_valid_number_content(peek_next())) {
-            // NOTE: This check does nothing. We need more context.
-            break;
+            break;        
         }
         if (peek_next() == greater_than) {
             this->move_forward();
@@ -245,7 +245,8 @@ auto compiler::lexer::lex_identifier() noexcept -> result<token, error> {
     }
 
     if (keywords.contains(contents)) {
-        return make_token_with_explicit_contents(keywords.at(contents), std::move(contents));
+        // return make_token_with_explicit_contents(keywords.at(contents), std::move(contents));
+        return make_token(keywords.at(contents));
     }
 
     return make_token_with_explicit_contents(token_type::IDENTIFIER, std::move(contents));

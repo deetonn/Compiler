@@ -20,7 +20,7 @@
 #include "../../common/error.hpp"
 #include "../../common/io.hpp"
 
-#define LEXER_DEBUG 1
+#define LEXER_DEBUG 0
 
 COMPILER_API_BEGIN
 
