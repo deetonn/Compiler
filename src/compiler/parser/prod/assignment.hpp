@@ -1,4 +1,5 @@
 
+#include <random>
 #ifndef _PARSER_PROD_ASSIGNMENT_H
 
 #include <optional>
@@ -21,18 +22,15 @@ COMPILER_API_BEGIN
 class assignment : public expression {
 private:
     identifier m_assignee;
-    type_information m_type_info;
-    std::optional<std::unique_ptr<ast_node>> m_expr;
+    std::optional<std::unique_ptr<expression>> m_expr;
     source_location m_location;
 public:
     COMPILER_API inline assignment(
-        const type_information& typeinfo,
         const identifier& assignee,
         const source_location& location,
-        std::optional<std::unique_ptr<ast_node>> expr = std::nullopt
+        std::optional<std::unique_ptr<expression>> expr = std::nullopt
     ) noexcept 
-        : m_type_info(typeinfo)
-        , m_location(location)
+        : m_location(location)
     {
         m_assignee = assignee;
         m_expr = std::move(expr);
@@ -48,10 +46,8 @@ public:
     COMPILER_API inline const identifier& assignee() const noexcept {
         return m_assignee;
     }
-    COMPILER_API inline const type_information& type() const noexcept {
-        return m_type_info;
-    }
-    COMPILER_API inline const std::optional<std::unique_ptr<ast_node>>& expression() const noexcept {
+    
+    COMPILER_API inline const std::optional<std::unique_ptr<expression>>& expression() const noexcept {
         return m_expr;
     }
 

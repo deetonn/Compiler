@@ -3,6 +3,7 @@
 
 #include "../../../common/common.hpp"
 #include "../../types.hpp"
+#include "../../../common/io.hpp"
 
 class ast_visitor;
 
@@ -24,7 +25,9 @@ public:
     virtual void accept(ast_visitor& visitor) {}
 
     virtual const source_location& location() const noexcept {
-        return source_location::invalid();
+        eprintln("ERROR: you called node.location() on a node without location() overriden");
+        std::exit(-1);
+        return (source_location&)(*(source_location*)0);
     }
 };
 // The base class of all AST nodes that represent a statement.
@@ -34,7 +37,9 @@ public:
     virtual void accept(ast_visitor& visitor) {}
 
     virtual const source_location& location() const noexcept {
-        return source_location::invalid();
+        eprintln("ERROR: you called node.location() on a node without location() overriden.");
+        std::exit(-1);
+        return (source_location&)(*(source_location*)0);
     }
 };
 // The base class of all AST nodes that represent a declaration.
@@ -44,7 +49,10 @@ public:
     virtual void accept(ast_visitor& visitor) {}
 
     virtual const source_location& location() const noexcept {
-        return source_location::invalid();
+        eprintln("ERROR: you called node.location() on a node without location() overriden.");
+        std::exit(-1);
+        // just to stop not-returning errors. (obviously std::exit stops this problem.)
+        return (source_location&)(*(source_location*)0);
     }
 };
 
