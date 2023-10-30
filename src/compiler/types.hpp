@@ -13,6 +13,7 @@
 #include <format>
 #include <cstddef>
 #include <bitset>
+#include <array>
 
 COMPILER_API_BEGIN
 
@@ -81,7 +82,7 @@ public:
     // the span at which this token occurs at.
     inline const source_span& span() const noexcept { return m_span; }
     // this tokens source location.
-    inline const source_location& source_location() const noexcept { return m_location; }
+    inline const source_location& location() const noexcept { return m_location; }
 
     // The optional contents attached to this token. This is set when the type() is an identifier, string or number.
     inline const std::optional<std::string>& lexeme() const noexcept { return m_lexeme; }
@@ -109,7 +110,15 @@ enum type_modifier {
   mod_static,
   mod_extern,
   mod_pointer,
-
+  mod_char,
+  mod_short,
+  mod_short_int,
+  mod_int,
+  mod_long_int,
+  mod_long_long_int,
+  mod_long,
+  mod_long_long,
+    
   // not included, just for the size of a bitset 
   mod_count  
 };
@@ -186,6 +195,11 @@ public:
 };
 
 using identifier = std::string;
+
+static inline constexpr std::array<identifier, 12> type_specifiers = {
+    "unsigned", "signed", "char", "short", "int", "long", "float",
+    "double", "volatile", "extern", "static", "register"  
+};
 
 COMPILER_API_END
 
