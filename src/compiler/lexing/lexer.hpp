@@ -83,7 +83,7 @@ private:
     _Lexer_internals m_internals{ 1, 0, 0, "<unknown>" };
     // the current span of the source contents that we're at.
     // m_span.end should always be equal to m_internals.position.
-    span m_span{ 0, 0 };
+    source_span m_span{ 0, 0 };
     source_info m_source_info;
 public:
     lexer() = delete;

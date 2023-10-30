@@ -15,6 +15,10 @@ public:
     virtual const source_location& location() const noexcept = 0;
 };
 
+class expression : public ast_node {
+  
+};
+
 COMPILER_API_END
 
 #define _PARSER_PROD_NODE_HPP
